@@ -30,7 +30,11 @@ private:
 
     void cleanup();
 
+    void createInstance();
+
     GLFWwindow* m_Window = nullptr;
+
+    VkInstance m_Instance;
 
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
