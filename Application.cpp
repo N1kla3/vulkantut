@@ -64,14 +64,18 @@ void Application::createInstance()
     VkInstanceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.pApplicationInfo = &app_info;
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers)
     {
         create_info.enabledLayerCount = static_cast<uint32_t>(ValidationLayers.size());
         create_info.ppEnabledLayerNames = ValidationLayers.data();
+        populateDebugMessengerCreateInfo(debugCreateInfo);
+        create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
     }
     else
     {
         create_info.enabledLayerCount = 0;
+        create_info.pNext = nullptr;
     }
     auto extensions_ = getRequiredExtensions();
     create_info.enabledExtensionCount = static_cast<uint32_t>(extensions_.size());
@@ -130,7 +134,8 @@ bool Application::checkValidationLayerSupport()
     return true;
 }
 
-std::vector<const char *> Application::getRequiredExtensions() {
+std::vector<const char *> Application::getRequiredExtensions()
+{
     uint32_t glfwExtensionsCount = 0;
     const char** glfwExtensions;
 
@@ -148,18 +153,25 @@ void Application::setupDebugMessenger()
     if (!enableValidationLayers) return;
 
     VkDebugUtilsMessengerCreateInfoEXT create_info{};
-    create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-    create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
-    create_info.pfnUserCallback = debugCallback;
-    create_info.pUserData = nullptr;
+    populateDebugMessengerCreateInfo(create_info);
 
     if (CreateDebugUtilsMessengerEXT(m_Instance, &create_info, nullptr, &debugMessenger) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to setup debug messenger");
     }
+}
+
+void Application::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo)
+{
+    createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo.messageSeverity =
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+    createInfo.messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    createInfo.pfnUserCallback = debugCallback;
 }

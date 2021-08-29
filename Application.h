@@ -81,6 +81,8 @@ private:
         return VK_FALSE;
     }
 
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+
     GLFWwindow* m_Window = nullptr;
 
     VkInstance m_Instance;
