@@ -19,6 +19,7 @@ void Application::initVulkan()
 {
     createInstance();
     setupDebugMessenger();
+    pickPhysicalDevice();
 }
 
 void Application::mainLoop()
@@ -174,4 +175,41 @@ void Application::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateIn
             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo.pfnUserCallback = debugCallback;
+}
+
+void Application::pickPhysicalDevice()
+{
+    VkPhysicalDevice phys_device = VK_NULL_HANDLE;
+    uint32_t DeviceCount = 0;
+    vkEnumeratePhysicalDevices(m_Instance, &DeviceCount, nullptr);
+    if (DeviceCount == 0)
+    {
+        throw std::runtime_error("failed to find GPU physical devices");
+    }
+
+    std::vector<VkPhysicalDevice> devices(DeviceCount);
+    vkEnumeratePhysicalDevices(m_Instance, &DeviceCount, devices.data());
+
+    for (const auto& device : devices)
+    {
+        if (isDeviceSuitable(device))
+        {
+            m_PhysDevice = device;
+            break;
+        }
+    }
+    if (m_PhysDevice == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("Failed to find suitable gpu");
+    }
+}
+
+bool Application::isDeviceSuitable(VkPhysicalDevice device)
+{
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(device, &properties);
+    VkPhysicalDeviceFeatures features;
+    vkGetPhysicalDeviceFeatures(device, &features);
+    return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+        && features.geometryShader;
 }

@@ -57,6 +57,8 @@ private:
 
     void initWindow();
 
+    void pickPhysicalDevice();
+
     void mainLoop();
 
     void cleanup();
@@ -66,6 +68,8 @@ private:
     bool checkValidationLayerSupport();
 
     void setupDebugMessenger();
+
+    bool isDeviceSuitable(VkPhysicalDevice device);
 
     std::vector<const char*> getRequiredExtensions();
 
@@ -86,6 +90,8 @@ private:
     GLFWwindow* m_Window = nullptr;
 
     VkInstance m_Instance;
+
+    VkPhysicalDevice m_PhysDevice;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
