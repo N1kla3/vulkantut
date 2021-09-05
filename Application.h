@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <vector>
+#include <optional>
 
 namespace
 {
@@ -43,6 +44,12 @@ namespace
 
 class Application {
 
+
+    struct QueueFamilyIndices
+    {
+        std::optional<uint32_t> graphics_family;
+    };
+
 public:
     void run()
     {
@@ -70,6 +77,8 @@ private:
     void setupDebugMessenger();
 
     bool isDeviceSuitable(VkPhysicalDevice device);
+
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
     std::vector<const char*> getRequiredExtensions();
 

@@ -3,6 +3,7 @@
 //
 #include "Application.h"
 #include <vector>
+#include <optional>
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
@@ -210,6 +211,31 @@ bool Application::isDeviceSuitable(VkPhysicalDevice device)
     vkGetPhysicalDeviceProperties(device, &properties);
     VkPhysicalDeviceFeatures features;
     vkGetPhysicalDeviceFeatures(device, &features);
+    auto indices = findQueueFamilies(device);
+
     return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-        && features.geometryShader;
+        && features.geometryShader && indices.graphics_family.has_value();
+}
+
+Application::QueueFamilyIndices Application::findQueueFamilies(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices{};
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queue_families(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queue_families.data());
+
+    int i = 0;
+    for (const auto& queue : queue_families)
+    {
+        if (queue.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphics_family = i;
+            break;
+        }
+        i++;
+    }
+
+    return indices;
 }
