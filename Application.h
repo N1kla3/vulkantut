@@ -72,6 +72,8 @@ private:
 
     void createInstance();
 
+    void createLogicalDevice();
+
     bool checkValidationLayerSupport();
 
     void setupDebugMessenger();
@@ -101,6 +103,10 @@ private:
     VkInstance m_Instance;
 
     VkPhysicalDevice m_PhysDevice;
+
+    VkDevice m_LogicalDevice;
+
+    VkQueue graphics_queue;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
