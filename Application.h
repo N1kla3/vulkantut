@@ -48,13 +48,19 @@ class Application {
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphics_family;
+        std::optional<uint32_t> present_family;
+
+        bool isComplete() const
+        {
+            return graphics_family.has_value() && present_family.has_value();
+        }
     };
 
 public:
     void run()
     {
-        initVulkan();
         initWindow();
+        initVulkan();
         mainLoop();
         cleanup();
     }
@@ -73,6 +79,8 @@ private:
     void createInstance();
 
     void createLogicalDevice();
+
+    void createSurface();
 
     bool checkValidationLayerSupport();
 
@@ -96,6 +104,8 @@ private:
         return VK_FALSE;
     }
 
+    VkSurfaceKHR m_Surface;
+
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
     GLFWwindow* m_Window = nullptr;
@@ -107,6 +117,8 @@ private:
     VkDevice m_LogicalDevice;
 
     VkQueue graphics_queue;
+
+    VkQueue present_queue;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
