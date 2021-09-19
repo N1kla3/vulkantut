@@ -3,6 +3,8 @@
 //
 #pragma once
 
+#define NOMINMAX
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -56,6 +58,13 @@ class Application {
         }
     };
 
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> present_modes;
+    };
+
 public:
     void run()
     {
@@ -82,13 +91,25 @@ private:
 
     void createSurface();
 
+    void createSwapChain();
+
     bool checkValidationLayerSupport();
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
     void setupDebugMessenger();
 
     bool isDeviceSuitable(VkPhysicalDevice device);
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
     std::vector<const char*> getRequiredExtensions();
 
@@ -116,9 +137,17 @@ private:
 
     VkDevice m_LogicalDevice;
 
+    VkSwapchainKHR m_SwapChain;
+
     VkQueue graphics_queue;
 
     VkQueue present_queue;
+
+    std::vector<VkImage> m_SwapChainImages;
+
+    VkFormat m_SwapChainImageFormat;
+
+    VkExtent2D m_SwapChainExtent;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
